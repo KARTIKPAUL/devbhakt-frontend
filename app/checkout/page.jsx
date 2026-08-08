@@ -292,13 +292,13 @@ export default function CheckoutPage() {
                   <p className="text-xs text-dharma-black/50">Pay when your order arrives</p>
                 </div>
               </label>
-              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition ${paymentMethod === "ONLINE" ? "border-saffron-600 bg-saffron-50" : "border-dharma-black/10"}`}>
+              {/* <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition ${paymentMethod === "ONLINE" ? "border-saffron-600 bg-saffron-50" : "border-dharma-black/10"}`}>
                 <input type="radio" name="payment" checked={paymentMethod === "ONLINE"} onChange={() => setPaymentMethod("ONLINE")} className="accent-saffron-600" />
                 <div>
                   <p className="text-sm font-semibold text-dharma-black">Pay Online</p>
                   <p className="text-xs text-dharma-black/50">UPI, Cards, Netbanking via Razorpay</p>
                 </div>
-              </label>
+              </label> */}
             </div>
           </div>
         </div>
