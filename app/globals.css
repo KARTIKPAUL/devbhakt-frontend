@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fdf8f1;
+  color: #161311;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-saffron-600 px-6 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-saffron-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-dharma-black bg-transparent px-6 py-3 text-sm font-semibold text-dharma-black transition hover:bg-dharma-black hover:text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.btn-outline-light {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-transparent px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-dharma-black active:scale-[0.98];
+}
+
+.input-field {
+  @apply w-full rounded-lg border border-dharma-black/15 bg-white px-4 py-3 text-sm text-dharma-black placeholder:text-dharma-black/40 focus:border-saffron-600 focus:outline-none focus:ring-2 focus:ring-saffron-600/20;
+}
+
+.label-field {
+  @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-dharma-black/60;
+}
+
+.section-heading {
+  @apply font-serif text-2xl font-bold text-dharma-black sm:text-3xl;
+}
+
+.chip {
+  @apply rounded-full border border-dharma-black/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-dharma-black/70 transition hover:border-saffron-600 hover:text-saffron-700;
+}
+
+.chip-active {
+  @apply border-saffron-600 bg-saffron-600 text-white hover:text-white;
+}
+
+::selection {
+  background-color: #fed7aa;
+  color: #161311;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
