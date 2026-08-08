@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import ProductCard from "@/components/ProductCard";
-import { ProductCardSkeleton } from "@/components/Loader";
+import Loader, { ProductCardSkeleton } from "@/components/Loader";
 
 const CATEGORIES = [
   { label: "T-Shirts", value: "T-Shirt", emoji: "👕" },
@@ -14,10 +16,20 @@ const CATEGORIES = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+  const { isAdmin, loading: authLoading } = useAuth();
   const [featured, setFeatured] = useState([]);
   const [newest, setNewest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Admins land here after refreshing / bookmarking "/" too — send them
+  // straight to the admin dashboard instead of the storefront.
+  useEffect(() => {
+    if (!authLoading && isAdmin) {
+      router.replace("/admin");
+    }
+  }, [authLoading, isAdmin, router]);
 
   useEffect(() => {
     let active = true;
@@ -29,7 +41,11 @@ export default function HomePage() {
         ]);
         if (!active) return;
         const featuredList = all.products?.filter((p) => p.isFeatured);
-        setFeatured(featuredList?.length ? featuredList.slice(0, 8) : all.products?.slice(0, 8) || []);
+        setFeatured(
+          featuredList?.length
+            ? featuredList.slice(0, 8)
+            : all.products?.slice(0, 8) || [],
+        );
         setNewest(latest.products || []);
       } catch (err) {
         if (active) setError(err.message);
@@ -41,6 +57,10 @@ export default function HomePage() {
       active = false;
     };
   }, []);
+
+  if (authLoading || isAdmin) {
+    return <Loader label="Redirecting to admin dashboard..." />;
+  }
 
   return (
     <div>
@@ -61,14 +81,18 @@ export default function HomePage() {
               Live Your <span className="text-saffron-500">Dharma.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-dharma-cream/70 sm:text-base lg:mx-0">
-              Devotional t-shirts, hoodies and totes inspired by Mahadev, Sanskrit shlokas and the
-              spirit of Sanatan dharma — designed for everyday bhakts.
+              Devotional t-shirts, hoodies and totes inspired by Mahadev,
+              Sanskrit shlokas and the spirit of Sanatan dharma — designed for
+              everyday bhakts.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <Link href="/shop" className="btn-primary">
                 Shop Collection
               </Link>
-              <Link href="/shop?collection=Mahadev%20Collection" className="btn-outline-light">
+              <Link
+                href="/shop?collection=Mahadev%20Collection"
+                className="btn-outline-light"
+              >
                 Mahadev Collection
               </Link>
             </div>
@@ -111,25 +135,34 @@ export default function HomePage() {
       <section className="container-page py-14 sm:py-20">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-saffron-600">Handpicked</p>
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-saffron-600">
+              Handpicked
+            </p>
             <h2 className="section-heading">Featured Products</h2>
           </div>
-          <Link href="/shop" className="hidden text-sm font-semibold text-saffron-700 hover:underline sm:block">
+          <Link
+            href="/shop"
+            className="hidden text-sm font-semibold text-saffron-700 hover:underline sm:block"
+          >
             View all →
           </Link>
         </div>
 
         {error && (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            Couldn&apos;t load products: {error}. Make sure your DevBhakt backend is running and
-            NEXT_PUBLIC_API_URL is set correctly.
+            Couldn&apos;t load products: {error}. Make sure your DevBhakt
+            backend is running and NEXT_PUBLIC_API_URL is set correctly.
           </p>
         )}
 
         <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
           {loading
-            ? Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
-            : featured.map((product) => <ProductCard key={product._id} product={product} />)}
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            : featured.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
         </div>
 
         {!loading && featured.length === 0 && !error && (
@@ -149,15 +182,29 @@ export default function HomePage() {
       <section className="bg-dharma-sand py-14 sm:py-16">
         <div className="container-page grid grid-cols-1 gap-8 text-center sm:grid-cols-3">
           {[
-            { title: "Crafted with Bhakti", desc: "Every design carries meaning — rooted in scripture, symbolism and devotion." },
-            { title: "Premium Comfort", desc: "Soft, breathable fabric built for daily wear, satsang and everything between." },
-            { title: "COD & Secure Payments", desc: "Pay online via Razorpay or choose Cash on Delivery — your choice, always." },
+            {
+              title: "Crafted with Bhakti",
+              desc: "Every design carries meaning — rooted in scripture, symbolism and devotion.",
+            },
+            {
+              title: "Premium Comfort",
+              desc: "Soft, breathable fabric built for daily wear, satsang and everything between.",
+            },
+            {
+              title: "COD & Secure Payments",
+              desc: "Pay online via Razorpay or choose Cash on Delivery — your choice, always.",
+            },
           ].map((item) => (
-            <div key={item.title} className="flex flex-col items-center gap-2 px-4">
+            <div
+              key={item.title}
+              className="flex flex-col items-center gap-2 px-4"
+            >
               <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-saffron-600/10 text-saffron-700">
                 🔱
               </div>
-              <h3 className="font-serif text-lg font-bold text-dharma-black">{item.title}</h3>
+              <h3 className="font-serif text-lg font-bold text-dharma-black">
+                {item.title}
+              </h3>
               <p className="text-sm text-dharma-black/60">{item.desc}</p>
             </div>
           ))}
@@ -169,35 +216,29 @@ export default function HomePage() {
         <section className="container-page py-14 sm:py-20">
           <div className="mb-8 flex items-end justify-between">
             <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-saffron-600">Just Dropped</p>
+              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-saffron-600">
+                Just Dropped
+              </p>
               <h2 className="section-heading">New Arrivals</h2>
             </div>
-            <Link href="/shop?sort=newest" className="hidden text-sm font-semibold text-saffron-700 hover:underline sm:block">
+            <Link
+              href="/shop?sort=newest"
+              className="hidden text-sm font-semibold text-saffron-700 hover:underline sm:block"
+            >
               View all →
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
             {loading
-              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-              : newest.map((product) => <ProductCard key={product._id} product={product} />)}
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))
+              : newest.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
           </div>
         </section>
       )}
-
-      {/* CTA */}
-      <section className="bg-dharma-black py-14 text-center sm:py-16">
-        <div className="container-page">
-          <h2 className="font-serif text-2xl font-bold text-white sm:text-3xl">
-            Join the DevBhakt family 🔱
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-dharma-cream/60">
-            Create an account for faster checkout, saved addresses and order tracking.
-          </p>
-          <Link href="/register" className="btn-primary mt-6 inline-flex">
-            Create Account
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

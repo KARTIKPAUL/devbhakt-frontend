@@ -13,6 +13,42 @@ const SORT_OPTIONS = [
   { value: "price-desc", label: "Price: High to Low" },
 ];
 
+const PAGE_SIZE = 12;
+// Safety cap when pulling the full catalog for client-side search — 10 pages
+// of 50 (the backend's max page size) covers up to 500 products.
+const MAX_FETCH_PAGES = 10;
+
+// The backend's $text index only matches whole words, so a query like "maha"
+// won't find "Mahadev". To support real partial/substring search we instead
+// fetch the filtered catalog (category/price/sort applied, no text search)
+// and match products locally — the same approach used by the navbar
+// suggestions and the admin product search.
+async function fetchAndFilterBySearch(baseParams, query) {
+  const first = await api.getProducts({ ...baseParams, page: 1, limit: 50 });
+  let all = first.products || [];
+  const totalPages = Math.min(first.pages || 1, MAX_FETCH_PAGES);
+
+  if (totalPages > 1) {
+    const rest = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        api.getProducts({ ...baseParams, page: i + 2, limit: 50 })
+      )
+    );
+    rest.forEach((r) => {
+      all = all.concat(r.products || []);
+    });
+  }
+
+  const q = query.trim().toLowerCase();
+  return all.filter(
+    (p) =>
+      p.name?.toLowerCase().includes(q) ||
+      p.description?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q) ||
+      p.collectionName?.toLowerCase().includes(q)
+  );
+}
+
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,15 +87,34 @@ function ShopContent() {
     let active = true;
     setLoading(true);
     setError(null);
-    api
-      .getProducts({ category, collection, search, sort, page, minPrice, maxPrice, limit: 12 })
-      .then((data) => {
-        if (!active) return;
-        setProducts(data.products || []);
-        setPageInfo({ page: data.page, pages: data.pages, total: data.total });
-      })
-      .catch((err) => active && setError(err.message))
-      .finally(() => active && setLoading(false));
+
+    const baseParams = { category, collection, sort, minPrice, maxPrice };
+
+    if (search) {
+      fetchAndFilterBySearch(baseParams, search)
+        .then((filtered) => {
+          if (!active) return;
+          const totalFiltered = filtered.length;
+          const totalPagesFiltered = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
+          const currentPage = Math.min(Math.max(1, page), totalPagesFiltered);
+          const start = (currentPage - 1) * PAGE_SIZE;
+          setProducts(filtered.slice(start, start + PAGE_SIZE));
+          setPageInfo({ page: currentPage, pages: totalPagesFiltered, total: totalFiltered });
+        })
+        .catch((err) => active && setError(err.message))
+        .finally(() => active && setLoading(false));
+    } else {
+      api
+        .getProducts({ ...baseParams, page, limit: PAGE_SIZE })
+        .then((data) => {
+          if (!active) return;
+          setProducts(data.products || []);
+          setPageInfo({ page: data.page, pages: data.pages, total: data.total });
+        })
+        .catch((err) => active && setError(err.message))
+        .finally(() => active && setLoading(false));
+    }
+
     return () => {
       active = false;
     };

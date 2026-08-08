@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220">
+<rect width="800" height="220" fill="none"/>
+<text x="400" y="125" text-anchor="middle"
+      font-family="Georgia, 'Times New Roman', serif"
+      font-size="88" font-weight="700" fill="#f16702">Dev</text>
+<text x="548" y="125" text-anchor="middle"
+      font-family="Georgia, 'Times New Roman', serif"
+      font-size="88" font-weight="700" fill="#111">Bhakt</text>
+<path d="M180 155 H620" stroke="#f16702" stroke-width="4"/>
+<text x="400" y="190" text-anchor="middle"
+      font-family="Arial, sans-serif" font-size="20"
+      letter-spacing="3" fill="#111">WEAR YOUR FAITH. LIVE YOUR DHARMA.</text>
+</svg>
