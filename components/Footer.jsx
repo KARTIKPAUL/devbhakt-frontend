@@ -109,7 +109,8 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm text-dharma-cream/70">
             <li>Cash on Delivery available</li>
             <li>Secure payments via Razorpay</li>
-            <li>support@devbhakt.com</li>
+            <li>bhaktwear@gmail.com</li>
+            <li>+91 7479266556</li>
           </ul>
         </div>
       </div>
