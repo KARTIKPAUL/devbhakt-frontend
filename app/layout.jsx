@@ -7,8 +7,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
+
+
 export const metadata = {
-  title: "DevBhakt — Wear Your Faith. Live Your Dharma.",
+  title: "DevBhakt — Wear Your Faith. Live Your Dharma. ",
   description:
     "DevBhakt is a devotional clothing & lifestyle store — t-shirts, hoodies and totes inspired by Mahadev, Sanskrit shlokas and Sanatan dharma. Wear your faith, live your dharma.",
   icons: {
