@@ -5,8 +5,8 @@ import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Analytics from "@/components/Analytics";
 
-import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 
 
@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="flex min-h-screen flex-col bg-dharma-cream font-sans antialiased">
         <Suspense fallback={null}>
-          <GoogleAnalytics />
+        <Analytics />
         </Suspense>
         <AuthProvider>
           <CartProvider>

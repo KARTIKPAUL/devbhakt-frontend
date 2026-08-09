@@ -15,7 +15,7 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
  * Renders nothing visible. Does nothing at all if NEXT_PUBLIC_GA_MEASUREMENT_ID
  * isn't set, so it's safe to leave in place for local/dev environments.
  */
-export default function GoogleAnalytics() {
+export default function Analytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isFirstRender = useRef(true);
