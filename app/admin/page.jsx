@@ -45,7 +45,7 @@ export default function AdminDashboardPage() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="section-heading">Dashboard</h1>
-          <p className="mt-1 text-sm text-dharma-black/50">Overview of your DevBhakt store</p>
+          <p className="mt-1 text-sm text-dharma-black/50">Overview of your Kartikeyo store</p>
         </div>
         <Link href="/admin/products/new" className="btn-primary">
           + Add Product

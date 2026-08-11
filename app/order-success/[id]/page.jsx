@@ -35,7 +35,7 @@ export default function OrderSuccessPage() {
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-saffron-100 text-4xl">🔱</div>
       <h1 className="mt-6 font-serif text-3xl font-bold text-dharma-black">Order Placed Successfully!</h1>
       <p className="mt-2 max-w-md text-sm text-dharma-black/60">
-        Thank you for shopping with DevBhakt. Your devotional order is on its way to being blessed and
+        Thank you for shopping with Kartikeyo. Your devotional order is on its way to being blessed and
         shipped to you.
       </p>
 

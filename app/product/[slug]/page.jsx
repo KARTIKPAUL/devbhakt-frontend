@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import Loader from "@/components/Loader";
 import ProductCard from "@/components/ProductCard";
+import { getProductTypeConfig } from "@/lib/productTaxonomy";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -69,6 +70,7 @@ export default function ProductDetailPage() {
   const outOfStock = !product.stock || product.stock <= 0;
   const needsSize = product.sizes && product.sizes.length > 0;
   const canAdd = !outOfStock && (!needsSize || selectedSize);
+  const variantLabel = getProductTypeConfig(product.productType).variantLabel;
 
   const handleAddToCart = () => {
     if (!canAdd) {
@@ -96,7 +98,10 @@ export default function ProductDetailPage() {
         <span>/</span>
         <Link href="/shop" className="hover:text-saffron-600">Shop</Link>
         <span>/</span>
-        <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:text-saffron-600">
+        <Link
+          href={`/shop?type=${encodeURIComponent(product.productType || "")}&category=${encodeURIComponent(product.category)}`}
+          className="hover:text-saffron-600"
+        >
           {product.category}
         </Link>
         <span>/</span>
@@ -164,13 +169,33 @@ export default function ProductDetailPage() {
           </div>
           <p className="mt-1 text-xs font-medium text-dharma-black/50">Inclusive of all taxes</p>
 
+          {(product.material || product.origin || product.isCertified) && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {product.isCertified && (
+                <span className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">
+                  ✓ Certified Authentic
+                </span>
+              )}
+              {product.material && (
+                <span className="rounded-full bg-dharma-sand px-3 py-1 text-xs font-semibold text-dharma-black/70">
+                  {product.material}
+                </span>
+              )}
+              {product.origin && (
+                <span className="rounded-full bg-dharma-sand px-3 py-1 text-xs font-semibold text-dharma-black/70">
+                  Origin: {product.origin}
+                </span>
+              )}
+            </div>
+          )}
+
           <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-dharma-black/70">
             {product.description}
           </p>
 
           {needsSize && (
             <div className="mt-6">
-              <h3 className="label-field">Select Size</h3>
+              <h3 className="label-field">Select {variantLabel}</h3>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <button
@@ -225,6 +250,35 @@ export default function ProductDetailPage() {
             <div className="flex items-center gap-2">💳 <span>COD & Online Pay</span></div>
             <div className="flex items-center gap-2">🚚 <span>Pan-India Delivery</span></div>
           </div>
+
+          {product.attributes?.length > 0 && (
+            <div className="mt-8">
+              <h3 className="mb-3 font-serif text-lg font-bold text-dharma-black">Specifications</h3>
+              <div className="overflow-hidden rounded-xl border border-dharma-black/10">
+                {product.attributes.map((attr, idx) => (
+                  <div
+                    key={`${attr.label}-${idx}`}
+                    className={`flex px-4 py-2.5 text-sm ${idx % 2 === 0 ? "bg-dharma-sand/40" : "bg-white"}`}
+                  >
+                    <span className="w-1/3 font-semibold text-dharma-black/60">{attr.label}</span>
+                    <span className="flex-1 text-dharma-black">{attr.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {product.isCertified && product.certificateImage && (
+            <div className="mt-8">
+              <h3 className="mb-3 font-serif text-lg font-bold text-dharma-black">Certificate of Authenticity</h3>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={product.certificateImage}
+                alt="Certificate of authenticity"
+                className="max-w-xs rounded-xl border border-dharma-black/10"
+              />
+            </div>
+          )}
         </div>
       </div>
 

@@ -29,6 +29,11 @@ export default function ProductCard({ product }) {
             {discount}% OFF
           </span>
         )}
+        {product.isCertified && (
+          <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-green-700 shadow">
+            ✓ Certified
+          </span>
+        )}
         {outOfStock && (
           <span className="absolute inset-0 flex items-center justify-center bg-dharma-black/50 text-sm font-bold uppercase tracking-wide text-white">
             Out of Stock
@@ -45,6 +50,9 @@ export default function ProductCard({ product }) {
         <h3 className="line-clamp-2 text-sm font-semibold text-dharma-black sm:text-base">
           {product.name}
         </h3>
+        {product.material && (
+          <p className="mt-0.5 text-[11px] text-dharma-black/50">{product.material}</p>
+        )}
         <div className="mt-2 flex items-center gap-2">
           <span className="text-sm font-bold text-dharma-black sm:text-base">{formatPrice(price)}</span>
           {discount > 0 && (

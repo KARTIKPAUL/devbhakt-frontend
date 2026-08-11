@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
-
-const CATEGORY_OPTIONS = ["T-Shirt", "Hoodie", "Tote Bag"];
-const SIZE_OPTIONS = ["S", "M", "L", "XL", "XXL"];
+import { PRODUCT_TYPES, getProductTypeConfig, DEFAULT_PRODUCT_TYPE } from "@/lib/productTaxonomy";
 
 const emptyForm = {
   name: "",
   description: "",
-  category: "T-Shirt",
+  productType: DEFAULT_PRODUCT_TYPE,
+  category: getProductTypeConfig(DEFAULT_PRODUCT_TYPE).categories[0],
   collectionName: "",
   price: "",
   discountPrice: "",
@@ -20,6 +19,11 @@ const emptyForm = {
   sku: "",
   supplierSource: "",
   isFeatured: false,
+  material: "",
+  origin: "",
+  isCertified: false,
+  certificateImage: "",
+  attributes: [], // [{ label, value }]
 };
 
 export default function ProductForm({ initialProduct, onSuccess }) {
@@ -32,7 +36,8 @@ export default function ProductForm({ initialProduct, onSuccess }) {
       ? {
           name: initialProduct.name || "",
           description: initialProduct.description || "",
-          category: initialProduct.category || "T-Shirt",
+          productType: initialProduct.productType || DEFAULT_PRODUCT_TYPE,
+          category: initialProduct.category || "",
           collectionName: initialProduct.collectionName || "",
           price: initialProduct.price ?? "",
           discountPrice: initialProduct.discountPrice ?? "",
@@ -41,9 +46,21 @@ export default function ProductForm({ initialProduct, onSuccess }) {
           sku: initialProduct.sku || "",
           supplierSource: initialProduct.supplierSource || "",
           isFeatured: !!initialProduct.isFeatured,
+          material: initialProduct.material || "",
+          origin: initialProduct.origin || "",
+          isCertified: !!initialProduct.isCertified,
+          certificateImage: initialProduct.certificateImage || "",
+          attributes: initialProduct.attributes || [],
         }
       : emptyForm
   );
+
+  const typeConfig = useMemo(() => getProductTypeConfig(form.productType), [form.productType]);
+
+  // Custom (free-typed) variant/spec inputs
+  const [customVariant, setCustomVariant] = useState("");
+  const [newSpecLabel, setNewSpecLabel] = useState("");
+  const [newSpecValue, setNewSpecValue] = useState("");
 
   // Existing (already-uploaded) images — only relevant in edit mode
   const [existingImages, setExistingImages] = useState(initialProduct?.images || []);
@@ -55,11 +72,50 @@ export default function ProductForm({ initialProduct, onSuccess }) {
   const [removingImage, setRemovingImage] = useState(false);
   const [error, setError] = useState(null);
 
-  const toggleSize = (size) => {
+  // Switching product type resets category to the new type's first option
+  // and clears variants, since "S/M/L" makes no sense for a murti and
+  // "5 Mukhi" makes no sense for a t-shirt.
+  const handleProductTypeChange = (value) => {
+    const nextConfig = getProductTypeConfig(value);
     setForm((f) => ({
       ...f,
-      sizes: f.sizes.includes(size) ? f.sizes.filter((s) => s !== size) : [...f.sizes, size],
+      productType: value,
+      category: nextConfig.categories[0] || "",
+      sizes: [],
     }));
+  };
+
+  const toggleVariant = (variant) => {
+    setForm((f) => ({
+      ...f,
+      sizes: f.sizes.includes(variant) ? f.sizes.filter((s) => s !== variant) : [...f.sizes, variant],
+    }));
+  };
+
+  const addCustomVariant = () => {
+    const v = customVariant.trim();
+    if (!v) return;
+    if (!form.sizes.includes(v)) {
+      setForm((f) => ({ ...f, sizes: [...f.sizes, v] }));
+    }
+    setCustomVariant("");
+  };
+
+  const removeVariant = (variant) => {
+    setForm((f) => ({ ...f, sizes: f.sizes.filter((s) => s !== variant) }));
+  };
+
+  const addAttribute = (label = newSpecLabel, value = newSpecValue) => {
+    const l = label.trim();
+    const v = value.trim();
+    if (!l || !v) return;
+    setForm((f) => ({ ...f, attributes: [...f.attributes, { label: l, value: v }] }));
+    setNewSpecLabel("");
+    setNewSpecValue("");
+  };
+
+  const removeAttribute = (idx) => {
+    setForm((f) => ({ ...f, attributes: f.attributes.filter((_, i) => i !== idx) }));
   };
 
   const handleFileChange = (e) => {
@@ -100,6 +156,7 @@ export default function ProductForm({ initialProduct, onSuccess }) {
     const fd = new FormData();
     fd.append("name", form.name);
     fd.append("description", form.description);
+    fd.append("productType", form.productType);
     fd.append("category", form.category);
     fd.append("collectionName", form.collectionName);
     fd.append("price", form.price);
@@ -109,6 +166,11 @@ export default function ProductForm({ initialProduct, onSuccess }) {
     if (form.sku) fd.append("sku", form.sku);
     if (form.supplierSource) fd.append("supplierSource", form.supplierSource);
     fd.append("isFeatured", form.isFeatured);
+    if (form.material) fd.append("material", form.material);
+    if (form.origin) fd.append("origin", form.origin);
+    fd.append("isCertified", form.isCertified);
+    if (form.certificateImage) fd.append("certificateImage", form.certificateImage);
+    fd.append("attributes", JSON.stringify(form.attributes));
     newFiles.forEach((file) => fd.append("images", file));
     return fd;
   };
@@ -171,6 +233,28 @@ export default function ProductForm({ initialProduct, onSuccess }) {
               placeholder="Fabric, fit, print details, care instructions..."
             />
           </div>
+
+          <div>
+            <label className="label-field">Product Type *</label>
+            <div className="flex flex-wrap gap-2">
+              {PRODUCT_TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => handleProductTypeChange(t.value)}
+                  className={`flex items-center gap-1.5 rounded-lg border-2 px-3 py-2 text-sm font-semibold transition ${
+                    form.productType === t.value
+                      ? "border-saffron-600 bg-saffron-600 text-white"
+                      : "border-dharma-black/15 text-dharma-black hover:border-saffron-600"
+                  }`}
+                >
+                  <span>{t.icon}</span>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label-field">Category *</label>
@@ -180,7 +264,7 @@ export default function ProductForm({ initialProduct, onSuccess }) {
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
-                {CATEGORY_OPTIONS.map((c) => (
+                {typeConfig.categories.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -247,26 +331,186 @@ export default function ProductForm({ initialProduct, onSuccess }) {
         </div>
       </div>
 
-      {/* Sizes */}
+      {/* Variants (sizes / heights / mukhi depending on product type) */}
       <div className="rounded-2xl bg-white p-5 shadow-card sm:p-6">
-        <h2 className="mb-4 font-serif text-lg font-bold text-dharma-black">Available Sizes</h2>
-        <div className="flex flex-wrap gap-2">
-          {SIZE_OPTIONS.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => toggleSize(size)}
-              className={`h-11 min-w-[48px] rounded-lg border-2 px-3 text-sm font-semibold transition ${
-                form.sizes.includes(size)
-                  ? "border-saffron-600 bg-saffron-600 text-white"
-                  : "border-dharma-black/15 text-dharma-black hover:border-saffron-600"
-              }`}
-            >
-              {size}
-            </button>
-          ))}
+        <h2 className="mb-4 font-serif text-lg font-bold text-dharma-black">
+          {typeConfig.variantLabel} Options
+        </h2>
+
+        {typeConfig.variantOptions.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {typeConfig.variantOptions.map((variant) => (
+              <button
+                key={variant}
+                type="button"
+                onClick={() => toggleVariant(variant)}
+                className={`h-11 min-w-[48px] rounded-lg border-2 px-3 text-sm font-semibold transition ${
+                  form.sizes.includes(variant)
+                    ? "border-saffron-600 bg-saffron-600 text-white"
+                    : "border-dharma-black/15 text-dharma-black hover:border-saffron-600"
+                }`}
+              >
+                {variant}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Custom variant not in the quick-pick list (e.g. a one-off height) */}
+        <div className="flex gap-2">
+          <input
+            className="input-field"
+            value={customVariant}
+            onChange={(e) => setCustomVariant(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustomVariant();
+              }
+            }}
+            placeholder={`Add a custom ${typeConfig.variantLabel.toLowerCase()} (e.g. "15 inch")`}
+          />
+          <button type="button" onClick={addCustomVariant} className="btn-secondary shrink-0 px-4">
+            Add
+          </button>
         </div>
-        <p className="mt-2 text-xs text-dharma-black/40">Leave empty if the product is one-size / not size-based.</p>
+
+        {/* Any selected variants not in the preset list (custom-added, or from an edited product) */}
+        {form.sizes.filter((s) => !typeConfig.variantOptions.includes(s)).length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {form.sizes
+              .filter((s) => !typeConfig.variantOptions.includes(s))
+              .map((s) => (
+                <span
+                  key={s}
+                  className="flex items-center gap-1.5 rounded-lg border-2 border-saffron-600 bg-saffron-600 px-3 py-2 text-sm font-semibold text-white"
+                >
+                  {s}
+                  <button type="button" onClick={() => removeVariant(s)} className="text-white/80 hover:text-white">
+                    ✕
+                  </button>
+                </span>
+              ))}
+          </div>
+        )}
+
+        <p className="mt-2 text-xs text-dharma-black/40">
+          Leave empty if this product isn&apos;t sold in different {typeConfig.variantLabel.toLowerCase()}s.
+        </p>
+      </div>
+
+      {/* Material, origin & authenticity — most useful for murti/rudraksha */}
+      <div className="rounded-2xl bg-white p-5 shadow-card sm:p-6">
+        <h2 className="mb-4 font-serif text-lg font-bold text-dharma-black">Material & Authenticity</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label-field">Material</label>
+            <input
+              className="input-field"
+              value={form.material}
+              onChange={(e) => setForm({ ...form, material: e.target.value })}
+              placeholder="e.g. Brass, Marble, Panchdhatu, Cotton"
+            />
+          </div>
+          <div>
+            <label className="label-field">Origin</label>
+            <input
+              className="input-field"
+              value={form.origin}
+              onChange={(e) => setForm({ ...form, origin: e.target.value })}
+              placeholder="e.g. Nepal, Rajasthan, Java Indonesia"
+            />
+          </div>
+        </div>
+        <label className="mt-4 flex items-center gap-2 text-sm text-dharma-black/70">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-saffron-600"
+            checked={form.isCertified}
+            onChange={(e) => setForm({ ...form, isCertified: e.target.checked })}
+          />
+          This product is lab-certified / verified authentic
+        </label>
+        {form.isCertified && (
+          <div className="mt-3">
+            <label className="label-field">Certificate Image URL</label>
+            <input
+              className="input-field"
+              value={form.certificateImage}
+              onChange={(e) => setForm({ ...form, certificateImage: e.target.value })}
+              placeholder="Link to the certificate/authenticity proof image"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Specifications — free-form key/value attributes, e.g. Language, Author, Weight */}
+      <div className="rounded-2xl bg-white p-5 shadow-card sm:p-6">
+        <h2 className="mb-1 font-serif text-lg font-bold text-dharma-black">Specifications</h2>
+        <p className="mb-4 text-xs text-dharma-black/40">
+          Add any extra details worth showing customers — weight, dimensions, language, author, etc.
+        </p>
+
+        {typeConfig.attributeSuggestions.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {typeConfig.attributeSuggestions
+              .filter((s) => !form.attributes.some((a) => a.label === s))
+              .map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setNewSpecLabel(s)}
+                  className="chip"
+                >
+                  + {s}
+                </button>
+              ))}
+          </div>
+        )}
+
+        {form.attributes.length > 0 && (
+          <div className="mb-4 space-y-2">
+            {form.attributes.map((attr, idx) => (
+              <div key={`${attr.label}-${idx}`} className="flex items-center gap-2 rounded-lg bg-dharma-sand/60 px-3 py-2">
+                <span className="min-w-[100px] text-xs font-bold uppercase tracking-wide text-dharma-black/60">
+                  {attr.label}
+                </span>
+                <span className="flex-1 text-sm text-dharma-black">{attr.value}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttribute(idx)}
+                  className="text-xs font-bold text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            className="input-field"
+            value={newSpecLabel}
+            onChange={(e) => setNewSpecLabel(e.target.value)}
+            placeholder="Label (e.g. Weight)"
+          />
+          <input
+            className="input-field"
+            value={newSpecValue}
+            onChange={(e) => setNewSpecValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addAttribute();
+              }
+            }}
+            placeholder="Value (e.g. 450 g)"
+          />
+          <button type="button" onClick={() => addAttribute()} className="btn-secondary shrink-0 px-4">
+            Add
+          </button>
+        </div>
       </div>
 
       {/* Images */}

@@ -197,8 +197,8 @@ export default function Navbar() {
           
           {/* Compact icon + wordmark for mobile/tablet — no room for the tagline yet */}
           <Image
-            src="/DevBhakt_Logos/devbhakt-icon-logo.png"
-            alt="DevBhakt"
+            src="/DevBhakt_Logos/kartikeyo-icon-logo.png"
+            alt="Kartikeyo"
             width={206}
             height={82}
             className="h-9 w-auto sm:h-10 lg:hidden"
@@ -206,8 +206,8 @@ export default function Navbar() {
           />
           {/* Full lockup with tagline once we have desktop-width real estate */}
           <Image
-            src="/DevBhakt_Logos/devbhakt-header-logo.png"
-            alt="DevBhakt — Wear your faith, live your dharma"
+            src="/DevBhakt_Logos/kartikeyo-header-logo-removebg-preview.png"
+            alt="Kartikeyo — Wear your faith, live your dharma"
             width={255}
             height={94}
             className="hidden h-14 w-auto lg:block"

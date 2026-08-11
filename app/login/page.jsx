@@ -41,7 +41,7 @@ function LoginForm() {
         <div className="mb-6 flex flex-col items-center text-center">
           <Image
             src="/logo.png"
-            alt="DevBhakt"
+            alt="Kartikeyo"
             width={56}
             height={56}
             className="mb-3 h-14 w-14"
@@ -50,7 +50,7 @@ function LoginForm() {
             Welcome Back
           </h1>
           <p className="mt-1 text-sm text-dharma-black/50">
-            Login to continue your journey with DevBhakt
+            Login to continue your journey with Kartikeyo
           </p>
         </div>
 
@@ -99,7 +99,7 @@ function LoginForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-dharma-black/60">
-          New to DevBhakt?{" "}
+          New to Kartikeyo?{" "}
           <Link
             href="/register"
             className="font-semibold text-saffron-700 hover:underline"

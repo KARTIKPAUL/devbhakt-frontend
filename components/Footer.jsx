@@ -8,8 +8,8 @@ export default function Footer() {
         <div>
           <Link href="/" className="flex items-center">
             <Image
-              src="/DevBhakt_Logos/devbhakt-icon-logo.png"
-              alt="DevBhakt"
+              src="/DevBhakt_Logos/kartikeyo-icon-logo.png"
+              alt="Kartikeyo"
               width={206}
               height={82}
               className="h-9 w-auto sm:h-10 lg:hidden"
@@ -17,8 +17,8 @@ export default function Footer() {
             />
             {/* Full lockup with tagline once we have desktop-width real estate */}
             <Image
-              src="/DevBhakt_Logos/devbhakt-header-logo.png"
-              alt="DevBhakt — Wear your faith, live your dharma"
+              src="/DevBhakt_Logos/kartikeyo-dark-logo.png"
+              alt="Kartikeyo — Wear your faith, live your dharma"
               width={255}
               height={94}
               className="hidden h-14 w-auto lg:block"
@@ -117,7 +117,7 @@ export default function Footer() {
 
       <div className="border-t border-white/10 py-5">
         <p className="container-page text-center text-xs text-dharma-cream/50">
-          © {new Date().getFullYear()} DevBhakt. All rights reserved. Om Namah
+          © {new Date().getFullYear()} Kartikeyo. All rights reserved. Om Namah
           Shivaya 🔱
         </p>
       </div>

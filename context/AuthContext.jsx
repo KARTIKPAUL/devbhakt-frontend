@@ -11,8 +11,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("devbhakt_token");
-    const storedUser = localStorage.getItem("devbhakt_user");
+    const storedToken = localStorage.getItem("kartikeyo_token");
+    const storedUser = localStorage.getItem("kartikeyo_user");
     if (storedToken) setToken(storedToken);
     if (storedUser) {
       try {
@@ -27,8 +27,8 @@ export function AuthProvider({ children }) {
   const persist = useCallback((nextUser, nextToken) => {
     setUser(nextUser);
     setToken(nextToken);
-    if (nextToken) localStorage.setItem("devbhakt_token", nextToken);
-    if (nextUser) localStorage.setItem("devbhakt_user", JSON.stringify(nextUser));
+    if (nextToken) localStorage.setItem("kartikeyo_token", nextToken);
+    if (nextUser) localStorage.setItem("kartikeyo_user", JSON.stringify(nextUser));
   }, []);
 
   const login = useCallback(
@@ -52,15 +52,15 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("devbhakt_token");
-    localStorage.removeItem("devbhakt_user");
+    localStorage.removeItem("kartikeyo_token");
+    localStorage.removeItem("kartikeyo_user");
   }, []);
 
   const refreshProfile = useCallback(async () => {
     try {
       const data = await api.getProfile();
       setUser(data.user);
-      localStorage.setItem("devbhakt_user", JSON.stringify(data.user));
+      localStorage.setItem("kartikeyo_user", JSON.stringify(data.user));
       return data.user;
     } catch {
       return null;
@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
 
   const updateUser = useCallback((nextUser) => {
     setUser(nextUser);
-    localStorage.setItem("devbhakt_user", JSON.stringify(nextUser));
+    localStorage.setItem("kartikeyo_user", JSON.stringify(nextUser));
   }, []);
 
   return (

@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
 import { useToast } from "@/context/ToastContext";
 import Loader, { EmptyState } from "@/components/Loader";
+import { PRODUCT_TYPES, getProductTypeConfig } from "@/lib/productTaxonomy";
 
 export default function AdminProductsPage() {
   const { showToast } = useToast();
@@ -13,6 +14,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [busyId, setBusyId] = useState(null);
 
   const loadProducts = () => {
@@ -42,7 +44,11 @@ export default function AdminProductsPage() {
     }
   };
 
-  const filtered = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) &&
+      (!typeFilter || p.productType === typeFilter)
+  );
 
   if (loading) return <Loader label="Loading products..." />;
 
@@ -58,7 +64,7 @@ export default function AdminProductsPage() {
         </Link>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Search products..."
@@ -66,6 +72,18 @@ export default function AdminProductsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="input-field max-w-xs"
         />
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="input-field max-w-[220px]"
+        >
+          <option value="">All Product Types</option>
+          {PRODUCT_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.icon} {t.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {error && <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
@@ -84,6 +102,7 @@ export default function AdminProductsPage() {
               <thead>
                 <tr className="border-b border-dharma-black/10 bg-dharma-sand/50 text-xs font-semibold uppercase tracking-wide text-dharma-black/50">
                   <th className="px-4 py-3">Product</th>
+                  <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Category</th>
                   <th className="px-4 py-3">Price</th>
                   <th className="px-4 py-3">Stock</th>
@@ -109,6 +128,9 @@ export default function AdminProductsPage() {
                           )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-dharma-black/70">
+                      {getProductTypeConfig(product.productType).icon} {getProductTypeConfig(product.productType).label}
                     </td>
                     <td className="px-4 py-3 text-dharma-black/70">{product.category}</td>
                     <td className="px-4 py-3">

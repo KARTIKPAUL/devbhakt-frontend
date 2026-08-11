@@ -33,7 +33,7 @@ export default function AdminSidebar({ open, onClose }) {
         }`}
       >
         <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5 sm:h-20">
-          <Image src="/logo.png" alt="DevBhakt" width={36} height={36} className="h-9 w-9" />
+          <Image src="/logo.png" alt="Kartikeyo" width={36} height={36} className="h-9 w-9" />
           <div className="leading-tight">
             <p className="font-serif text-lg font-bold">
               <span className="text-saffron-500">Dev</span>Bhakt

@@ -11,9 +11,9 @@ import Analytics from "@/components/Analytics";
 
 
 export const metadata = {
-  title: "DevBhakt — Wear Your Faith. Live Your Dharma.",
+  title: "Kartikeyo — Wear Your Faith. Live Your Dharma.",
   description:
-    "DevBhakt is a devotional clothing & lifestyle store — t-shirts, hoodies and totes inspired by Mahadev, Sanskrit shlokas and Sanatan dharma. Wear your faith, live your dharma.",
+    "Kartikeyo is a devotional clothing & lifestyle store — t-shirts, hoodies and totes inspired by Mahadev, Sanskrit shlokas and Sanatan dharma. Wear your faith, live your dharma.",
   icons: {
     icon: "/logo.png",
   },

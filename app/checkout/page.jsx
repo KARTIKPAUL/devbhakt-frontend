@@ -136,7 +136,7 @@ export default function CheckoutPage() {
         key: rzpData.keyId,
         amount: rzpData.amount,
         currency: rzpData.currency,
-        name: "DevBhakt",
+        name: "Kartikeyo",
         description: "Order Payment",
         image: "/logo.png",
         order_id: rzpData.razorpayOrderId,

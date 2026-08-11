@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useMemo } 
 import { effectivePrice } from "@/lib/format";
 
 const CartContext = createContext(null);
-const STORAGE_KEY = "devbhakt_cart";
+const STORAGE_KEY = "kartikeyo_cart";
 
 // Each cart line: { productId, name, image, price, size, quantity, slug, stock }
 

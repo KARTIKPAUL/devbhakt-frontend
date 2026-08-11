@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import { ProductCardSkeleton, EmptyState } from "@/components/Loader";
+import { PRODUCT_TYPES, getProductTypeConfig, ALL_CATEGORIES } from "@/lib/productTaxonomy";
 
-const CATEGORIES = ["T-Shirt", "Hoodie", "Tote Bag"];
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
   { value: "price-asc", label: "Price: Low to High" },
@@ -45,7 +45,8 @@ async function fetchAndFilterBySearch(baseParams, query) {
       p.name?.toLowerCase().includes(q) ||
       p.description?.toLowerCase().includes(q) ||
       p.category?.toLowerCase().includes(q) ||
-      p.collectionName?.toLowerCase().includes(q)
+      p.collectionName?.toLowerCase().includes(q) ||
+      p.material?.toLowerCase().includes(q)
   );
 }
 
@@ -59,6 +60,7 @@ function ShopContent() {
   const [pageInfo, setPageInfo] = useState({ page: 1, pages: 1, total: 0 });
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const type = searchParams.get("type") || "";
   const category = searchParams.get("category") || "";
   const collection = searchParams.get("collection") || "";
   const search = searchParams.get("search") || "";
@@ -66,6 +68,10 @@ function ShopContent() {
   const page = Number(searchParams.get("page")) || 1;
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
+
+  // Category options narrow to the selected product type; show everything
+  // when no type is picked yet (e.g. landing on /shop with no filters).
+  const availableCategories = type ? getProductTypeConfig(type).categories : ALL_CATEGORIES;
 
   const updateParams = useCallback(
     (updates) => {
@@ -88,7 +94,7 @@ function ShopContent() {
     setLoading(true);
     setError(null);
 
-    const baseParams = { category, collection, sort, minPrice, maxPrice };
+    const baseParams = { type, category, collection, sort, minPrice, maxPrice };
 
     if (search) {
       fetchAndFilterBySearch(baseParams, search)
@@ -118,9 +124,10 @@ function ShopContent() {
     return () => {
       active = false;
     };
-  }, [category, collection, search, sort, page, minPrice, maxPrice]);
+  }, [type, category, collection, search, sort, page, minPrice, maxPrice]);
 
-  const activeFilterCount = [category, collection, minPrice, maxPrice].filter(Boolean).length;
+  const activeFilterCount = [type, category, collection, minPrice, maxPrice].filter(Boolean).length;
+  const currentTypeConfig = type ? getProductTypeConfig(type) : null;
 
   return (
     <div className="container-page py-8 sm:py-12">
@@ -129,11 +136,30 @@ function ShopContent() {
           {search ? `Search results for "${search}"` : "Collection"}
         </p>
         <h1 className="font-serif text-2xl font-bold text-dharma-black sm:text-4xl">
-          {category || collection || "All Products"}
+          {category || collection || currentTypeConfig?.label || "All Products"}
         </h1>
         <p className="text-sm text-dharma-black/50">
           {loading ? "Loading..." : `${pageInfo.total} product${pageInfo.total === 1 ? "" : "s"} found`}
         </p>
+      </div>
+
+      {/* Product type tabs */}
+      <div className="mb-5 flex flex-wrap gap-2">
+        <button
+          onClick={() => updateParams({ type: "", category: "" })}
+          className={`chip ${!type ? "chip-active" : ""}`}
+        >
+          All
+        </button>
+        {PRODUCT_TYPES.map((t) => (
+          <button
+            key={t.value}
+            onClick={() => updateParams({ type: t.value, category: "" })}
+            className={`chip flex items-center gap-1.5 ${type === t.value ? "chip-active" : ""}`}
+          >
+            <span>{t.icon}</span> {t.label}
+          </button>
+        ))}
       </div>
 
       {/* Mobile filter/sort toggle */}
@@ -172,7 +198,7 @@ function ShopContent() {
                 >
                   All
                 </button>
-                {CATEGORIES.map((cat) => (
+                {availableCategories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => updateParams({ category: cat })}
@@ -209,7 +235,7 @@ function ShopContent() {
 
             {activeFilterCount > 0 && (
               <button
-                onClick={() => updateParams({ category: "", collection: "", minPrice: "", maxPrice: "" })}
+                onClick={() => updateParams({ type: "", category: "", collection: "", minPrice: "", maxPrice: "" })}
                 className="text-xs font-semibold text-saffron-700 hover:underline"
               >
                 Clear all filters

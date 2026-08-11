@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await register(form);
-      showToast("Account created! Welcome to DevBhakt 🔱");
+      showToast("Account created! Welcome to Kartikeyo 🔱");
       router.push("/account");
     } catch (err) {
       setError(err.message);
@@ -35,9 +35,9 @@ export default function RegisterPage() {
     <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-card sm:p-8">
         <div className="mb-6 flex flex-col items-center text-center">
-          <Image src="/logo.png" alt="DevBhakt" width={56} height={56} className="mb-3 h-14 w-14" />
+          <Image src="/logo.png" alt="Kartikeyo" width={56} height={56} className="mb-3 h-14 w-14" />
           <h1 className="font-serif text-2xl font-bold text-dharma-black">Create Account</h1>
-          <p className="mt-1 text-sm text-dharma-black/50">Join DevBhakt — wear your faith, live your dharma</p>
+          <p className="mt-1 text-sm text-dharma-black/50">Join Kartikeyo — wear your faith, live your dharma</p>
         </div>
 
         {error && <p className="mb-4 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-700">{error}</p>}

@@ -8,12 +8,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import ProductCard from "@/components/ProductCard";
 import Loader, { ProductCardSkeleton } from "@/components/Loader";
-
-const CATEGORIES = [
-  { label: "T-Shirts", value: "T-Shirt", emoji: "👕" },
-  { label: "Hoodies", value: "Hoodie", emoji: "🧥" },
-  { label: "Tote Bags", value: "Tote Bag", emoji: "👜" },
-];
+import { PRODUCT_TYPES } from "@/lib/productTaxonomy";
 
 export default function HomePage() {
   const router = useRouter();
@@ -81,9 +76,9 @@ export default function HomePage() {
               Live Your <span className="text-saffron-500">Dharma.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-dharma-cream/70 sm:text-base lg:mx-0">
-              Devotional t-shirts, hoodies and totes inspired by Mahadev,
-              Sanskrit shlokas and the spirit of Sanatan dharma — designed for
-              everyday bhakts.
+              Devotional streetwear, murtis, rudraksha and puja essentials
+              inspired by Mahadev, Sanskrit shlokas and the spirit of Sanatan
+              dharma — everything a bhakt needs, in one place.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <Link href="/shop" className="btn-primary">
@@ -102,7 +97,7 @@ export default function HomePage() {
             <div className="relative flex h-56 w-56 items-center justify-center rounded-full bg-gradient-to-br from-saffron-500/20 to-transparent sm:h-72 sm:w-72 lg:h-96 lg:w-96">
               <Image
                 src="/logo.png"
-                alt="DevBhakt — Wear Your Faith, Live Your Dharma"
+                alt="Kartikeyo — Wear Your Faith, Live Your Dharma"
                 width={420}
                 height={420}
                 className="h-full w-full rounded-full object-cover shadow-lift"
@@ -115,16 +110,16 @@ export default function HomePage() {
 
       {/* Category strip */}
       <section className="container-page -mt-8 relative z-10 sm:-mt-10">
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          {CATEGORIES.map((cat) => (
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 sm:gap-4">
+          {PRODUCT_TYPES.map((t) => (
             <Link
-              key={cat.value}
-              href={`/shop?category=${encodeURIComponent(cat.value)}`}
+              key={t.value}
+              href={`/shop?type=${encodeURIComponent(t.value)}`}
               className="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 text-center shadow-card transition hover:-translate-y-1 hover:shadow-lift sm:p-6"
             >
-              <span className="text-2xl sm:text-3xl">{cat.emoji}</span>
+              <span className="text-2xl sm:text-3xl">{t.icon}</span>
               <span className="text-xs font-bold uppercase tracking-wide text-dharma-black sm:text-sm">
-                {cat.label}
+                {t.label}
               </span>
             </Link>
           ))}
@@ -150,7 +145,7 @@ export default function HomePage() {
 
         {error && (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            Couldn&apos;t load products: {error}. Make sure your DevBhakt
+            Couldn&apos;t load products: {error}. Make sure your Kartikeyo
             backend is running and NEXT_PUBLIC_API_URL is set correctly.
           </p>
         )}
